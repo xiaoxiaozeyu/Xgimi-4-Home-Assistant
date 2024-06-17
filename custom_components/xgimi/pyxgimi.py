@@ -3,6 +3,7 @@ import asyncio
 from bluez_peripheral.util import get_message_bus
 from bluez_peripheral.advert import Advertisement
 from time import time
+from ping3 import ping
 
 
 class XgimiApi:
@@ -65,13 +66,11 @@ class XgimiApi:
 
     async def async_check_alive(self):
         try:
-            _, writer = await asyncio.open_connection(
-                self.ip, self.alive_port)
-            writer.close()
-            await writer.wait_closed()
-            return True
-        except ConnectionRefusedError:
-            return False
+            ret = ping(self.ip)
+            if ret not in [False, None]:
+                return True
+            else:
+                return False
         except Exception:
             return False
 
